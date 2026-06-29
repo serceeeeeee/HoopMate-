@@ -1,0 +1,18 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">训练历史</view>
+    <block wx:if="{{sessions.length}}">
+      <view wx:for="{{sessions}}" wx:key="id" class="history-item">
+        <view class="row">
+          <view>
+            <view class="item-title">{{item.training_date}} · {{item.category}}</view>
+            <view class="muted">{{item.duration_min}} 分钟｜强度 {{item.intensity}}｜命中率 {{item.shooting_rate}}%</view>
+          </view>
+          <button size="mini" class="danger-btn" data-id="{{item.id}}" bindtap="remove">删除</button>
+        </view>
+        <view wx:if="{{item.note}}" class="note">{{item.note}}</view>
+      </view>
+    </block>
+    <view wx:else class="muted">暂无训练记录，请先在“记录”页新增训练。</view>
+  </view>
+</view>

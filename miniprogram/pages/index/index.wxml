@@ -1,0 +1,78 @@
+<view class="hm-page index-page">
+  <view class="hero card-highlight">
+    <view class="row-between hero-top">
+      <view>
+        <view class="page-title">HoopMate</view>
+        <view class="page-subtitle">篮球训练数据记录与分析助手</view>
+      </view>
+      <view class="avatar" bindtap="goProfile">HM</view>
+    </view>
+    <view class="hero-slogan">今天的训练，值得被记录。</view>
+    <view class="hero-desc">用训练记录、趋势分析和规则化建议，持续追踪你的投篮稳定性、训练量和个人成长。</view>
+    <view class="btn-row hero-actions">
+      <button class="primary-btn" bindtap="goRecord">开始记录</button>
+      <button class="secondary-btn" bindtap="goAnalysis">查看分析</button>
+    </view>
+  </view>
+
+  <view class="metric-grid">
+    <view class="metric-card">
+      <view class="metric-value accent">{{summary.total_sessions || 0}}</view>
+      <view class="metric-label">累计训练次数</view>
+      <view class="metric-trend">最近 7 天 {{summary.recent_7day_sessions || 0}} 次</view>
+    </view>
+    <view class="metric-card">
+      <view class="metric-value cyan">{{summary.total_duration || 0}}</view>
+      <view class="metric-label">累计训练时长 / min</view>
+      <view class="metric-trend">平均 {{summary.avg_duration || 0}} min</view>
+    </view>
+    <view class="metric-card">
+      <view class="metric-value">{{summary.avg_shooting_rate || 0}}%</view>
+      <view class="metric-label">整体命中率</view>
+      <view class="progress"><view class="progress-inner" style="width: {{targetRateProgress}}%;"></view></view>
+    </view>
+    <view class="metric-card">
+      <view class="metric-value">{{summary.recent_7day_sessions || 0}}/{{profile.weekly_goal_sessions || 3}}</view>
+      <view class="metric-label">本周训练目标</view>
+      <view class="progress"><view class="progress-inner" style="width: {{weekProgress}}%;"></view></view>
+    </view>
+  </view>
+
+  <view class="hm-card recent-card">
+    <view class="row-between">
+      <view class="section-title">最近训练</view>
+      <view class="tag cyan" bindtap="goRecord">去记录</view>
+    </view>
+    <block wx:if="{{latest}}">
+      <view class="recent-title">{{latest.category}} · {{latest.training_date}}</view>
+      <view class="recent-metrics">
+        <view><text>{{latest.duration_min}}</text><text>min</text></view>
+        <view><text>{{latest.intensity}}</text><text>强度</text></view>
+        <view><text>{{latest.shooting_rate}}</text><text>% 命中率</text></view>
+      </view>
+      <view class="page-subtitle one-line">{{latest.note || '暂无备注，建议记录动作感受和下次调整点。'}}</view>
+    </block>
+    <view wx:else class="empty">
+      暂无训练记录。可先加载示例数据快速体验，也可以直接记录第一次训练。
+    </view>
+  </view>
+
+  <view class="hm-card">
+    <view class="section-title">核心使用流程</view>
+    <view class="flow-grid">
+      <view class="flow-step"><view>01</view><text>记录训练</text><text>出手、命中、时长、强度</text></view>
+      <view class="flow-step"><view>02</view><text>分析趋势</text><text>命中率、训练量、专项占比</text></view>
+      <view class="flow-step"><view>03</view><text>生成建议</text><text>下周计划与短板提升</text></view>
+    </view>
+  </view>
+
+  <view class="hm-card">
+    <view class="section-title">Demo 快捷入口</view>
+    <view class="quick-grid">
+      <view class="quick-item" bindtap="seedDemo"><text>加载示例数据</text><text>快速展示完整流程</text></view>
+      <view class="quick-item" bindtap="goAdvice"><text>训练建议</text><text>查看下周训练计划</text></view>
+      <view class="quick-item" bindtap="goPlayers"><text>球员数据展示</text><text>表格、柱状图、散点图</text></view>
+      <view class="quick-item" bindtap="goAbout"><text>项目说明</text><text>定位、技术、验收重点</text></view>
+    </view>
+  </view>
+</view>

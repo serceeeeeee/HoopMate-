@@ -1,0 +1,31 @@
+<view class="hm-page about-page">
+  <view class="hm-card card-highlight">
+    <view class="page-title">项目说明</view>
+    <view class="page-subtitle">HoopMate 是面向篮球爱好者的轻量级篮球训练记录与数据分析工具，用于实习项目 Demo、开发汇报和成果验收。</view>
+  </view>
+
+  <view class="hm-card">
+    <view class="section-title">项目定位</view>
+    <view class="about-text">围绕篮球运动与个人训练场景，提供训练数据记录、趋势复盘、规则化建议和数据可视化展示，帮助用户形成持续训练和科学复盘习惯。</view>
+  </view>
+
+  <view class="hm-card">
+    <view class="section-title">核心功能</view>
+    <view wx:for="{{features}}" wx:key="*this" class="about-row"><text>{{index + 1}}</text><view>{{item}}</view></view>
+  </view>
+
+  <view class="hm-card">
+    <view class="section-title">技术方案</view>
+    <view wx:for="{{techs}}" wx:key="*this" class="about-row cyan"><text>{{index + 1}}</text><view>{{item}}</view></view>
+  </view>
+
+  <view class="hm-card">
+    <view class="section-title">数据来源说明</view>
+    <view wx:for="{{sources}}" wx:key="*this" class="about-row"><text>{{index + 1}}</text><view>{{item}}</view></view>
+  </view>
+
+  <view class="hm-card">
+    <view class="section-title">验收重点对应</view>
+    <view wx:for="{{checks}}" wx:key="*this" class="about-row green"><text>{{index + 1}}</text><view>{{item}}</view></view>
+  </view>
+</view>

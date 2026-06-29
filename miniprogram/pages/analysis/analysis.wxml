@@ -1,0 +1,83 @@
+<view class="hm-page analysis-page">
+  <view class="hm-card page-head">
+    <view class="page-title">数据分析</view>
+    <view class="page-subtitle">用趋势、训练量、专项占比和区域表现复盘训练效果。</view>
+    <view class="range-row">
+      <view wx:for="{{ranges}}" wx:key="label" data-index="{{index}}" bindtap="selectRange" class="range-chip {{rangeIndex === index ? 'active' : ''}}">{{item.label}}</view>
+    </view>
+  </view>
+
+  <view class="metric-grid">
+    <view class="metric-card"><view class="metric-value accent">{{summary.avg_shooting_rate || 0}}%</view><view class="metric-label">平均命中率</view></view>
+    <view class="metric-card"><view class="metric-value cyan">{{summary.total_duration || 0}}</view><view class="metric-label">训练总量 / min</view></view>
+    <view class="metric-card"><view class="metric-value">{{summary.total_load || 0}}</view><view class="metric-label">训练负荷</view></view>
+    <view class="metric-card"><view class="metric-value">{{summary.recent_7day_sessions || 0}}</view><view class="metric-label">近 7 天训练次数</view></view>
+  </view>
+
+  <view class="hm-card chart-card">
+    <view class="row-between"><view class="section-title">命中率趋势</view><view class="tag active">折线趋势</view></view>
+    <block wx:if="{{trendRows.length}}">
+      <scroll-view scroll-x class="trend-scroll">
+        <view class="trend-line-wrap">
+          <view wx:for="{{trendRows}}" wx:key="date" class="trend-node">
+            <view class="node-rate">{{item.rate}}%</view>
+            <view class="node-dot" style="bottom: {{item.rateWidth}}%;"></view>
+            <view class="node-line" style="height: {{item.rateWidth}}%;"></view>
+            <view class="node-date">{{item.date}}</view>
+          </view>
+        </view>
+      </scroll-view>
+    </block>
+    <view wx:else class="empty">暂无命中率趋势数据。</view>
+  </view>
+
+  <view class="hm-card chart-card">
+    <view class="row-between"><view class="section-title">训练量趋势</view><view class="tag cyan">柱状图</view></view>
+    <block wx:if="{{durationRows.length}}">
+      <scroll-view scroll-x class="bar-scroll">
+        <view class="bar-wrap">
+          <view wx:for="{{durationRows}}" wx:key="date" class="bar-item">
+            <view class="bar-value">{{item.duration}}</view>
+            <view class="bar" style="height: {{item.durationHeight}}%;"></view>
+            <view class="node-date">{{item.date}}</view>
+          </view>
+        </view>
+      </scroll-view>
+    </block>
+    <view wx:else class="empty">暂无训练量数据。</view>
+  </view>
+
+  <view class="hm-card">
+    <view class="section-title">项目分析</view>
+    <block wx:if="{{categoryRows.length}}">
+      <view wx:for="{{categoryRows}}" wx:key="category" class="analysis-row">
+        <view class="row-between"><text>{{item.category}} · {{item.sessions}} 次</text><text>{{item.percent}}%</text></view>
+        <view class="progress"><view class="progress-inner" style="width: {{item.percentWidth}}%;"></view></view>
+      </view>
+    </block>
+    <view wx:else class="empty">暂无训练类型占比数据。</view>
+  </view>
+
+  <view class="hm-card court-card">
+    <view class="row-between"><view class="section-title">区域分析</view><view class="tag warn">半场区域</view></view>
+    <view class="court-visual">
+      <view class="court-line arc"></view>
+      <view class="court-line paint"></view>
+      <view class="rim"></view>
+      <view wx:for="{{zoneRows}}" wx:key="zone" class="zone-label zone-{{index}}">{{item.zone}} {{item.rate}}%</view>
+    </view>
+    <block wx:if="{{zoneRows.length}}">
+      <view wx:for="{{zoneRows}}" wx:key="zone" class="analysis-row">
+        <view class="row-between"><text>{{item.zone}}：{{item.makes}}/{{item.attempts}}</text><text>{{item.rate}}%</text></view>
+        <view class="progress"><view class="progress-inner" style="width: {{item.width}}%;"></view></view>
+      </view>
+    </block>
+    <view wx:else class="empty">暂无区域分析数据。请录入罚球、中投或三分分项。</view>
+  </view>
+
+  <view class="hm-card conclusion-card">
+    <view class="section-title">数据结论</view>
+    <view class="conclusion-text">{{conclusion}}</view>
+    <button class="primary-btn" bindtap="goAdvice">查看训练建议</button>
+  </view>
+</view>

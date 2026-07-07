@@ -84,6 +84,3 @@ def get_session_detail(session_id: int, user_id: int = 1, db: Session = Depends(
         "recommendations": generate_session_recommendations(session_data, zone_data, comparison),
         "summaryText": comparison["text"],
     }
-git add .
-git commit -m "feat: 完善训练分析 API 路由" \
-  -m "新增训练汇总、趋势、分类、投篮热区、投篮点位和单次训练详情接口，接入分析服务与推荐服务，为 HoopMate 分析页和训练详情页提供后端数据支持。"

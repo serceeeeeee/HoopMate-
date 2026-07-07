@@ -1,5 +1,6 @@
 App({
   globalData: {
-    userId: 1
+    userId: 1,
+    appName: 'HoopMate'
   }
 });

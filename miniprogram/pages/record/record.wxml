@@ -1,105 +1,57 @@
-<view class="hm-page record-page">
-  <view class="hm-card page-head">
+<view class="hm-page with-tab">
+  <view class="page-head">
+    <view class="page-kicker">TRAINING LOG</view>
     <view class="page-title">训练记录</view>
-    <view class="page-subtitle">记录每一次投篮、训练量、强度和训练感受。</view>
-    <view class="tool-grid">
-      <button class="secondary-btn" bindtap="seedDemo">示例数据</button>
-      <button class="ghost-btn" bindtap="importCsv">CSV 导入</button>
-      <button class="ghost-btn" bindtap="exportCsv">CSV 导出</button>
-      <button class="primary-btn" bindtap="submit">保存记录</button>
-    </view>
-    <view wx:if="{{exportUrl}}" class="export-tip">导出地址已复制：{{exportUrl}}</view>
+    <view class="page-subtitle">手动录入投篮训练数据，支持示例数据、CSV 导入导出和单次训练详情。</view>
   </view>
 
   <view class="hm-card">
-    <view class="row-between">
-      <view class="section-title">新增训练</view>
-      <view class="tag active">实时命中率 {{previewRate}}%</view>
+    <view class="section-header"><view><view class="section-title">新增训练</view><view class="section-subtitle">命中数不能大于出手数，保存后分析页自动更新</view></view><view class="section-action">{{previewRate}}%</view></view>
+    <view class="form-item"><text class="label">训练日期</text><input class="input" value="{{form.training_date}}" data-field="training_date" bindinput="onInput" /></view>
+    <view class="form-item"><text class="label">训练类型</text><view class="tag-row"><view wx:for="{{categories}}" wx:key="*this" class="tag {{form.category === item ? 'active' : ''}}" data-value="{{item}}" bindtap="chooseCategory">{{item}}</view></view></view>
+    <view class="wrap-row">
+      <view class="col-2"><view class="form-item"><text class="label">训练时长</text><input class="input" type="number" value="{{form.duration_min}}" data-field="duration_min" bindinput="onInput" /></view></view>
+      <view class="col-2"><view class="form-item"><text class="label">强度 1-10</text><input class="input" type="number" value="{{form.intensity}}" data-field="intensity" bindinput="onInput" /></view></view>
+      <view class="col-2"><view class="form-item"><text class="label">总投篮</text><input class="input" type="number" value="{{form.total_shots}}" data-field="total_shots" bindinput="onInput" /></view></view>
+      <view class="col-2"><view class="form-item"><text class="label">总命中</text><input class="input" type="number" value="{{form.made_shots}}" data-field="made_shots" bindinput="onInput" /></view></view>
     </view>
-
-    <view class="two-col">
-      <view class="form-item">
-        <text class="label">训练日期</text>
-        <picker mode="date" value="{{form.training_date}}" bindchange="onDateChange">
-          <view class="picker-box">{{form.training_date}}</view>
-        </picker>
-      </view>
-      <view class="form-item">
-        <text class="label">训练类型</text>
-        <picker range="{{categories}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
-          <view class="picker-box">{{form.category}}</view>
-        </picker>
-      </view>
+    <view class="wrap-row">
+      <view class="col-2"><view class="form-item"><text class="label">罚球出手</text><input class="input" type="number" value="{{form.free_throw_attempts}}" data-field="free_throw_attempts" bindinput="onInput" /></view></view>
+      <view class="col-2"><view class="form-item"><text class="label">罚球命中</text><input class="input" type="number" value="{{form.free_throw_makes}}" data-field="free_throw_makes" bindinput="onInput" /></view></view>
+      <view class="col-2"><view class="form-item"><text class="label">中投出手</text><input class="input" type="number" value="{{form.mid_attempts}}" data-field="mid_attempts" bindinput="onInput" /></view></view>
+      <view class="col-2"><view class="form-item"><text class="label">中投命中</text><input class="input" type="number" value="{{form.mid_makes}}" data-field="mid_makes" bindinput="onInput" /></view></view>
+      <view class="col-2"><view class="form-item"><text class="label">三分出手</text><input class="input" type="number" value="{{form.three_attempts}}" data-field="three_attempts" bindinput="onInput" /></view></view>
+      <view class="col-2"><view class="form-item"><text class="label">三分命中</text><input class="input" type="number" value="{{form.three_makes}}" data-field="three_makes" bindinput="onInput" /></view></view>
     </view>
-
-    <view class="two-col">
-      <view class="form-item">
-        <text class="label">训练时长 / min</text>
-        <input class="input" type="number" value="{{form.duration_min}}" data-field="duration_min" bindinput="onNumberInput" />
-      </view>
-      <view class="form-item">
-        <text class="label">训练强度：{{form.intensity}}</text>
-        <slider activeColor="#FF7A1A" backgroundColor="#263244" block-color="#FDBA74" min="1" max="10" step="1" value="{{form.intensity}}" bindchange="onIntensityChange" />
-      </view>
-    </view>
-
-    <view class="shot-panel">
-      <view class="shot-title">总投篮数据</view>
-      <view class="two-col">
-        <view class="form-item"><text class="label">总出手数</text><input class="input" type="number" value="{{form.total_shots}}" data-field="total_shots" bindinput="onNumberInput" /></view>
-        <view class="form-item"><text class="label">总命中数</text><input class="input" type="number" value="{{form.made_shots}}" data-field="made_shots" bindinput="onNumberInput" /></view>
-      </view>
-      <view class="progress"><view class="progress-inner" style="width: {{previewRate}}%;"></view></view>
-    </view>
-
-    <view class="shot-grid">
-      <view class="shot-mini">
-        <view class="shot-title">罚球 命中/出手</view>
-        <view class="two-col"><input class="input" type="number" value="{{form.free_throw_makes}}" data-field="free_throw_makes" bindinput="onNumberInput" /><input class="input" type="number" value="{{form.free_throw_attempts}}" data-field="free_throw_attempts" bindinput="onNumberInput" /></view>
-      </view>
-      <view class="shot-mini">
-        <view class="shot-title">中投 命中/出手</view>
-        <view class="two-col"><input class="input" type="number" value="{{form.mid_makes}}" data-field="mid_makes" bindinput="onNumberInput" /><input class="input" type="number" value="{{form.mid_attempts}}" data-field="mid_attempts" bindinput="onNumberInput" /></view>
-      </view>
-      <view class="shot-mini">
-        <view class="shot-title">三分 命中/出手</view>
-        <view class="two-col"><input class="input" type="number" value="{{form.three_makes}}" data-field="three_makes" bindinput="onNumberInput" /><input class="input" type="number" value="{{form.three_attempts}}" data-field="three_attempts" bindinput="onNumberInput" /></view>
-      </view>
-    </view>
-
-    <view class="form-item">
-      <text class="label">训练备注</text>
-      <textarea class="textarea" value="{{form.note}}" data-field="note" bindinput="onTextInput" placeholder="记录训练内容、手感、问题或下次计划" />
-    </view>
-
-    <button class="primary-btn" bindtap="submit">保存训练记录</button>
+    <view class="form-item"><text class="label">训练备注</text><textarea class="textarea" value="{{form.note}}" data-field="note" bindinput="onInput" /></view>
+    <button class="primary-btn" bindtap="save">保存训练记录</button>
   </view>
 
   <view class="hm-card">
-    <view class="row-between">
-      <view class="section-title">训练记录列表</view>
-      <view class="tag cyan">{{sessions.length}} 条</view>
+    <view class="section-header"><view><view class="section-title">数据管理</view><view class="section-subtitle">CSV 导入导出在无后端时也可演示</view></view></view>
+    <view class="btn-row">
+      <button class="secondary-btn small-btn" bindtap="loadDemo">加载示例</button>
+      <button class="ghost-btn small-btn" bindtap="importCsv">CSV 导入</button>
+      <button class="ghost-btn small-btn" bindtap="exportCsv">CSV 导出</button>
     </view>
-    <block wx:if="{{sessions.length}}">
-      <view wx:for="{{sessions}}" wx:key="id" class="session-card">
-        <view class="row-between">
-          <view>
-            <view class="session-title">{{item.category}} · {{item.training_date}}</view>
-            <view class="page-subtitle">{{item.duration_min}} min · 强度 {{item.intensity}} · 负荷 {{item.training_load}}</view>
-          </view>
-          <view class="rate-pill">{{item.shooting_rate}}%</view>
+  </view>
+
+  <view class="hm-card">
+    <view class="section-header"><view><view class="section-title">训练记录列表</view><view class="section-subtitle">共 {{records.length}} 条，点击进入单次训练详情</view></view></view>
+    <view wx:for="{{records}}" wx:key="id" class="record-card">
+      <view class="row-between" bindtap="goDetail" data-id="{{item.id}}">
+        <view>
+          <view class="record-title">{{item.category}} · {{item.training_date}}</view>
+          <view class="record-meta">{{item.duration_min}} min · 强度 {{item.intensity}} · 出手 {{item.total_shots}} · 命中 {{item.made_shots}}</view>
+          <view class="record-meta">{{item.note}}</view>
         </view>
-        <view class="divider"></view>
-        <view class="session-stats">
-          <text>出手 {{item.total_shots}}</text>
-          <text>命中 {{item.made_shots}}</text>
-          <text>罚球 {{item.free_throw_makes}}/{{item.free_throw_attempts}}</text>
-          <text>三分 {{item.three_makes}}/{{item.three_attempts}}</text>
+        <view style="text-align:right;">
+          <view class="record-rate">{{item.shooting_rate}}%</view>
+          <view class="tag {{item.tagLevel}}">{{item.tagText}}</view>
         </view>
-        <view class="page-subtitle note">{{item.note || '暂无备注'}}</view>
-        <button class="danger-btn small-btn" data-id="{{item.id}}" bindtap="remove">删除</button>
       </view>
-    </block>
-    <view wx:else class="empty">暂无记录。点击“示例数据”可快速生成 Demo 数据。</view>
+      <view class="divider"></view>
+      <button class="danger-btn small-btn" data-id="{{item.id}}" bindtap="remove">删除记录</button>
+    </view>
   </view>
 </view>

@@ -1,5 +1,1 @@
-.about-text { color: #CBD5E1; font-size: 28rpx; line-height: 1.8; }
-.about-row { display: grid; grid-template-columns: 58rpx 1fr; gap: 18rpx; align-items: start; padding: 18rpx 0; border-bottom: 1rpx solid rgba(255,255,255,.07); color: #CBD5E1; font-size: 26rpx; line-height: 1.6; }
-.about-row text { width: 44rpx; height: 44rpx; line-height: 44rpx; text-align: center; border-radius: 16rpx; background: rgba(255,122,26,.16); color: #FDBA74; font-weight: 900; font-size: 22rpx; }
-.about-row.cyan text { background: rgba(34,211,238,.12); color: #67E8F9; }
-.about-row.green text { background: rgba(52,211,153,.12); color: #86EFAC; }
+/* 项目说明页使用全局样式 */

@@ -1,0 +1,41 @@
+<view class="shot-heatmap-card">
+  <view class="section-header heatmap-title-row">
+    <view>
+      <view class="section-title">{{title}}</view>
+      <view class="section-subtitle">{{subtitle}}</view>
+    </view>
+    <view class="section-action">命中率</view>
+  </view>
+  <view class="heatmap-summary-row">
+    <view wx:for="{{summary}}" wx:key="label" class="heatmap-summary-item">
+      <view class="heatmap-summary-value">{{item.value}}</view>
+      <view class="heatmap-summary-label">{{item.label}}</view>
+      <view class="heatmap-summary-sub">{{item.sub}}</view>
+    </view>
+  </view>
+  <view class="court-heatmap-v3">
+    <view wx:for="{{zones}}" wx:key="id" data-id="{{item.id}}" bindtap="selectZone" class="heat-zone-v3 {{item.layoutClass}} {{selectedZone.id == item.id ? 'is-selected' : ''}}" style="background: {{item.color}}; color: {{item.textColor}};">
+      <view class="heat-zone-v3-name">{{item.shortName}}</view>
+      <view class="heat-zone-v3-rate">{{item.label}}</view>
+      <view class="heat-zone-v3-sub">{{item.sub}}</view>
+    </view>
+    <view class="court-v3-line court-v3-three-arc"></view>
+    <view class="court-v3-line court-v3-lane"></view>
+    <view class="court-v3-line court-v3-free-circle"></view>
+    <view class="court-v3-line court-v3-backboard"></view>
+    <view class="court-v3-line court-v3-rim"></view>
+  </view>
+  <view class="heatmap-legend-row" wx:if="{{showLegend}}">
+    <view class="legend-pair"><view class="legend-swatch empty"></view><text>无出手</text></view>
+    <view class="legend-gradient"><view class="legend-step s1"></view><view class="legend-step s2"></view><view class="legend-step s3"></view><view class="legend-step s4"></view></view>
+    <view class="legend-labels"><text>低</text><text>高</text></view>
+  </view>
+  <view class="selected-zone-panel" wx:if="{{selectedZone.id}}">
+    <view>
+      <view class="selected-zone-name">{{selectedZoneTitle}}</view>
+      <view class="selected-zone-meta">{{selectedZone.makes}}/{{selectedZone.attempts}} · 出手占比 {{selectedZone.share}}%</view>
+    </view>
+    <view class="selected-zone-rate">{{selectedZone.label}}</view>
+  </view>
+  <view class="heatmap-insight" wx:if="{{showInsight}}">{{insightText}}</view>
+</view>

@@ -1,0 +1,10 @@
+<view class="hm-page">
+  <view class="hm-card">
+    <view class="tag active">{{item.category}}</view>
+    <view class="page-title" style="margin-top:18rpx;">{{item.title}}</view>
+    <view class="record-meta">{{item.source}} · {{item.publishedAt}}</view>
+    <view class="divider"></view>
+    <view class="page-subtitle">{{item.summary}}</view>
+    <view class="page-subtitle">这是 HoopMate 演示新闻详情页。正式接入真实新闻 API 后，可在后端代理层返回原文链接或正文内容，前端页面不直接暴露 API Key。</view>
+  </view>
+</view>

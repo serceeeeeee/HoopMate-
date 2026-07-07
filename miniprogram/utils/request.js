@@ -1,29 +1,37 @@
-const { API_BASE } = require("./config");
+const cfg = require("./config");
+
+function buildQuery(data) {
+  data = data || {};
+  const keys = Object.keys(data).filter(function(key) {
+    return data[key] !== undefined && data[key] !== null && data[key] !== "";
+  });
+  return keys.map(function(key) {
+    return encodeURIComponent(key) + "=" + encodeURIComponent(data[key]);
+  }).join("&");
+}
 
 function request(options) {
-  return new Promise((resolve, reject) => {
+  options = options || {};
+  const method = options.method || "GET";
+  const data = options.data || {};
+  const url = cfg.API_BASE + options.url;
+  return new Promise(function(resolve, reject) {
     wx.request({
-      url: API_BASE + options.url,
-      method: options.method || "GET",
-      data: options.data || {},
-      header: {
-        "content-type": "application/json"
-      },
-      success(res) {
+      url: url,
+      method: method,
+      data: data,
+      timeout: options.timeout || 8000,
+      header: { "content-type": "application/json" },
+      success: function(res) {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           resolve(res.data);
         } else {
-          const message = (res.data && (res.data.detail || res.data.message)) || "请求失败";
-          wx.showToast({ title: String(message).slice(0, 24), icon: "none" });
           reject(res);
         }
       },
-      fail(err) {
-        wx.showToast({ title: "网络请求失败", icon: "none" });
-        reject(err);
-      }
+      fail: function(err) { reject(err); }
     });
   });
 }
 
-module.exports = { request };
+module.exports = { request: request, buildQuery: buildQuery };

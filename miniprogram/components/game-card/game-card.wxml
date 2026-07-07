@@ -1,0 +1,6 @@
+<view class="game-card">
+  <view class="game-head"><view class="league">{{item.league}}</view><view class="status {{item.status}}">{{item.status}}</view></view>
+  <view class="team-row"><text>{{item.awayTeam}}</text><text class="score">{{item.status == 'Upcoming' ? '-' : item.awayScore}}</text></view>
+  <view class="team-row"><text>{{item.homeTeam}}</text><text class="score">{{item.status == 'Upcoming' ? '-' : item.homeScore}}</text></view>
+  <view class="game-meta">{{item.startTime}} · {{item.venue}}</view>
+</view>

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "训练详情",
+  "usingComponents": {
+    "court-heatmap-canvas": "/components/court-heatmap-canvas/court-heatmap-canvas"
+  }
+}

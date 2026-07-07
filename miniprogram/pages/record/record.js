@@ -1,166 +1,48 @@
-const { request } = require("../../utils/request");
-const { API_BASE, DEFAULT_USER_ID } = require("../../utils/config");
-const { today, clampPercent } = require("../../utils/format");
-
-const defaultForm = () => ({
-  user_id: DEFAULT_USER_ID,
-  training_date: today(),
-  category: "投篮",
-  duration_min: 60,
-  intensity: 5,
-  total_shots: 100,
-  made_shots: 50,
-  free_throw_attempts: 20,
-  free_throw_makes: 15,
-  three_attempts: 30,
-  three_makes: 10,
-  mid_attempts: 30,
-  mid_makes: 15,
-  note: ""
-});
-
+var kit = null; try { kit = require('../../services/stableData'); } catch(e) { kit = null; }
+function todayFallback() { var d = new Date(); var m = d.getMonth() + 1; var day = d.getDate(); return d.getFullYear() + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day); }
+function tag(rate) { if (rate >= 60) return { tagText:'Excellent', tagLevel:'excellent' }; if (rate >= 45) return { tagText:'Good', tagLevel:'good' }; return { tagText:'Need Work', tagLevel:'work' }; }
 Page({
   data: {
-    categories: ["投篮", "运球", "体能", "综合", "比赛", "恢复"],
-    categoryIndex: 0,
-    form: defaultForm(),
+    categories: ['投篮','运球','体能','综合','比赛'],
+    form: { training_date: todayFallback(), category: '投篮', duration_min: 60, intensity: 6, total_shots: 100, made_shots: 50, free_throw_attempts: 20, free_throw_makes: 15, mid_attempts: 35, mid_makes: 18, three_attempts: 30, three_makes: 12, note: '' },
     previewRate: 50,
-    sessions: [],
-    loading: false,
-    exportUrl: ""
+    records: []
   },
-
-  onShow() {
-    this.loadSessions();
-    this.updatePreview();
+  onLoad: function() { this.refresh(); this.updateRate(); },
+  onShow: function() { this.refresh(); },
+  refresh: function() {
+    if (!kit) return;
+    var arr = kit.sessions();
+    for (var i = 0; i < arr.length; i++) { var t = tag(arr[i].shooting_rate); arr[i].tagText = t.tagText; arr[i].tagLevel = t.tagLevel; }
+    this.setData({ records: arr });
   },
-
-  loadSessions() {
-    request({ url: `/api/training/sessions?user_id=${DEFAULT_USER_ID}&limit=50` })
-      .then(data => this.setData({ sessions: data || [] }))
-      .catch(() => {});
+  chooseCategory: function(e) { this.setData({ 'form.category': e.currentTarget.dataset.value }); },
+  onInput: function(e) { var key = e.currentTarget.dataset.field; var val = e.detail.value; var obj = {}; obj['form.' + key] = val; this.setData(obj); this.updateRate(); },
+  updateRate: function() { var f = this.data.form; var total = Number(f.total_shots || 0); var made = Number(f.made_shots || 0); var r = total > 0 ? Math.round(made / total * 1000) / 10 : 0; this.setData({ previewRate: r }); },
+  save: function() {
+    var f = this.data.form; if (Number(f.made_shots || 0) > Number(f.total_shots || 0)) { wx.showToast({ title:'命中数不能大于出手数', icon:'none' }); return; }
+    if (kit) kit.saveSession(f); this.refresh(); wx.showToast({ title:'记录成功', icon:'success' });
   },
-
-  onDateChange(e) {
-    this.setData({ "form.training_date": e.detail.value });
+  loadDemo: function() { if (kit) kit.resetSessions(); this.refresh(); wx.showToast({ title:'示例数据已加载', icon:'success' }); },
+  exportCsv: function() {
+    var arr = this.data.records; var lines = ['training_date,category,duration_min,intensity,total_shots,made_shots,note'];
+    for (var i=0;i<arr.length;i++) lines.push([arr[i].training_date,arr[i].category,arr[i].duration_min,arr[i].intensity,arr[i].total_shots,arr[i].made_shots,(arr[i].note||'').replace(/,/g,'，')].join(','));
+    wx.setClipboardData({ data: lines.join('\n'), success: function(){ wx.showToast({ title:'CSV已复制', icon:'success' }); } });
   },
-
-  onCategoryChange(e) {
-    const index = Number(e.detail.value);
-    this.setData({
-      categoryIndex: index,
-      "form.category": this.data.categories[index]
-    });
+  importCsv: function() {
+    var self = this;
+    if (!wx.chooseMessageFile) { wx.showToast({ title:'当前环境不支持文件选择', icon:'none' }); return; }
+    wx.chooseMessageFile({ count:1, type:'file', extension:['csv'], success:function(res){
+      var path = res.tempFiles && res.tempFiles[0] ? res.tempFiles[0].path : '';
+      if (!path) return;
+      wx.getFileSystemManager().readFile({ filePath:path, encoding:'utf8', success:function(r){ self.parseCsv(r.data); }, fail:function(){ wx.showToast({ title:'读取CSV失败', icon:'none' }); } });
+    }});
   },
-
-  onIntensityChange(e) {
-    this.setData({ "form.intensity": Number(e.detail.value) });
+  parseCsv: function(text) {
+    if (!kit) return; var lines = String(text || '').split(/\r?\n/); var count = 0;
+    for (var i=1;i<lines.length;i++) { var p = lines[i].split(','); if (p.length >= 6) { kit.saveSession({ training_date:p[0], category:p[1], duration_min:p[2], intensity:p[3], total_shots:p[4], made_shots:p[5], note:p[6] || 'CSV导入' }); count++; } }
+    this.refresh(); wx.showToast({ title:'导入' + count + '条', icon:'success' });
   },
-
-  onNumberInput(e) {
-    const field = e.currentTarget.dataset.field;
-    const value = Number(e.detail.value || 0);
-    this.setData({ [`form.${field}`]: value }, () => this.updatePreview());
-  },
-
-  onTextInput(e) {
-    const field = e.currentTarget.dataset.field;
-    this.setData({ [`form.${field}`]: e.detail.value });
-  },
-
-  updatePreview() {
-    const f = this.data.form;
-    const rate = f.total_shots > 0 ? Math.round(f.made_shots / f.total_shots * 1000) / 10 : 0;
-    this.setData({ previewRate: clampPercent(rate) });
-  },
-
-  validate(form) {
-    if (!form.training_date) return "请选择训练日期";
-    if (form.duration_min <= 0) return "训练时长必须大于 0";
-    if (form.made_shots > form.total_shots) return "总命中数不能大于总出手数";
-    if (form.free_throw_makes > form.free_throw_attempts) return "罚球命中数不能大于出手数";
-    if (form.three_makes > form.three_attempts) return "三分命中数不能大于出手数";
-    if (form.mid_makes > form.mid_attempts) return "中投命中数不能大于出手数";
-    return "";
-  },
-
-  submit() {
-    const form = this.data.form;
-    const error = this.validate(form);
-    if (error) {
-      wx.showToast({ title: error, icon: "none" });
-      return;
-    }
-    request({ url: "/api/training/sessions", method: "POST", data: form })
-      .then(() => {
-        wx.showToast({ title: "保存成功", icon: "success" });
-        this.setData({ form: defaultForm(), categoryIndex: 0 }, () => this.updatePreview());
-        this.loadSessions();
-      });
-  },
-
-  seedDemo() {
-    wx.showModal({
-      title: "加载示例数据",
-      content: "将生成一组演示训练记录，用于快速体验分析和建议功能。示例数据不代表真实训练结果。",
-      success: (res) => {
-        if (!res.confirm) return;
-        request({ url: `/api/demo/seed?user_id=${DEFAULT_USER_ID}`, method: "POST" })
-          .then((data) => {
-            wx.showToast({ title: data.message || "已加载", icon: "success" });
-            this.loadSessions();
-          });
-      }
-    });
-  },
-
-  exportCsv() {
-    const url = `${API_BASE}/api/export/csv?user_id=${DEFAULT_USER_ID}`;
-    this.setData({ exportUrl: url });
-    wx.setClipboardData({ data: url });
-    wx.showToast({ title: "导出链接已复制", icon: "success" });
-  },
-
-  importCsv() {
-    wx.chooseMessageFile({
-      count: 1,
-      type: "file",
-      extension: ["csv"],
-      success: (res) => {
-        const file = res.tempFiles && res.tempFiles[0];
-        if (!file) return;
-        wx.uploadFile({
-          url: `${API_BASE}/api/training/import_csv?user_id=${DEFAULT_USER_ID}`,
-          filePath: file.path,
-          name: "file",
-          success: (uploadRes) => {
-            try {
-              const data = JSON.parse(uploadRes.data || "{}");
-              wx.showToast({ title: data.message || "导入完成", icon: "none" });
-            } catch (e) {
-              wx.showToast({ title: "导入完成", icon: "success" });
-            }
-            this.loadSessions();
-          },
-          fail: () => wx.showToast({ title: "CSV 上传失败", icon: "none" })
-        });
-      }
-    });
-  },
-
-  remove(e) {
-    const id = e.currentTarget.dataset.id;
-    wx.showModal({
-      title: "确认删除",
-      content: "删除后该条训练记录无法恢复，并会影响统计分析结果。",
-      success: (res) => {
-        if (!res.confirm) return;
-        request({ url: `/api/training/sessions/${id}?user_id=${DEFAULT_USER_ID}`, method: "DELETE" })
-          .then(() => {
-            wx.showToast({ title: "已删除", icon: "success" });
-            this.loadSessions();
-          });
-      }
-    });
-  }
+  remove: function(e) { var self=this; var id=e.currentTarget.dataset.id; wx.showModal({ title:'删除记录', content:'确认删除这条训练记录？', success:function(res){ if(res.confirm && kit){ kit.deleteSession(id); self.refresh(); } } }); },
+  goDetail: function(e) { wx.navigateTo({ url:'/pages/workout-detail/workout-detail?id=' + e.currentTarget.dataset.id }); }
 });

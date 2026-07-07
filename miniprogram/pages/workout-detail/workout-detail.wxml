@@ -1,0 +1,36 @@
+<view class="hm-page">
+  <view class="page-head">
+    <view class="page-kicker">WORKOUT DETAIL</view>
+    <view class="page-title">单次训练详情</view>
+    <view class="page-subtitle">{{session.training_date}} · {{session.category}}</view>
+  </view>
+
+  <view class="wrap-row">
+    <view class="col-2"><view class="metric-box"><view class="metric-label">命中率</view><view class="metric-value orange">{{session.shooting_rate}}<text class="metric-unit">%</text></view><view class="metric-sub">{{session.made_shots}}/{{session.total_shots}}</view></view></view>
+    <view class="col-2"><view class="metric-box"><view class="metric-label">训练时长</view><view class="metric-value">{{session.duration_min}}<text class="metric-unit">min</text></view><view class="metric-sub">强度 {{session.intensity}}</view></view></view>
+  </view>
+
+  <court-heatmap-canvas
+    zones="{{zones}}"
+    summary="{{heatmapSummary}}"
+    title="本次投篮热区图"
+    subtitle="基于本次训练的区域投篮数据生成"
+    tag="命中率"
+    height-rpx="500"
+    bindzonechange="onHeatmapZoneChange"
+  ></court-heatmap-canvas>
+
+  <view class="hm-card">
+    <view class="section-header"><view><view class="section-title">投篮点位</view><view class="section-subtitle">橙色圆点为命中，灰色叉号为未命中</view></view></view>
+    <view class="court">
+      <view class="court-line paint-line"></view><view class="court-line ft-line"></view><view class="court-line arc-line"></view><view class="court-line hoop-line"></view>
+      <view wx:for="{{points}}" wx:key="id" class="shot-point {{item.made ? '' : 'miss'}}" style="left: {{item.x}}%; top: {{item.y}}%;">{{item.made ? '' : '×'}}</view>
+    </view>
+  </view>
+
+  <view class="hm-card">
+    <view class="section-header"><view><view class="section-title">本次训练总结</view><view class="section-subtitle">系统根据命中率和热区自动生成</view></view></view>
+    <view class="record-card"><view class="record-title">{{summaryText}}</view><view class="record-meta">{{session.note}}</view></view>
+    <view wx:for="{{advices}}" wx:key="title" class="record-card"><view class="row-between"><view class="record-title">{{item.title}}</view><view class="tag active">{{item.priority}}</view></view><view class="record-meta">{{item.text}}</view><view class="record-meta">建议：{{item.action}}</view></view>
+  </view>
+</view>

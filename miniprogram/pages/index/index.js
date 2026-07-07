@@ -1,53 +1,44 @@
-const { request } = require("../../utils/request");
-const { DEFAULT_USER_ID } = require("../../utils/config");
-const { clampPercent } = require("../../utils/format");
-
+var kit = null;
+try { kit = require('../../services/stableData'); } catch (e) { kit = null; }
+function fallbackSummary() { return { total_shots: 683, made_shots: 323, avg_shooting_rate: 47.3, recent_7day_sessions: 4, recent_7day_rate_change: 5.3, latest_date: '今日', paint_rate: 58, three_rate: 41 }; }
 Page({
   data: {
-    summary: {},
-    profile: {},
-    latest: null,
-    weekProgress: 0,
-    targetRateProgress: 0,
-    loading: false
+    summary: fallbackSummary(),
+    profile: { weekly_goal_sessions: 4 },
+    latest: { id: 1, category: '投篮', training_date: '今日', duration_min: 60, intensity: 7, total_shots: 100, shooting_rate: 50, note: '示例训练记录' },
+    weekProgress: 100,
+    rateChangeText: '+5.3%',
+    todayStatus: '今日训练状态',
+    todayStatusShort: '已加载'
   },
-
-  onShow() {
-    this.loadData();
+  onLoad: function() { this.refresh(); },
+  onShow: function() { this.refresh(); },
+  refresh: function() {
+    if (!kit) return;
+    var arr = kit.sessions();
+    var sm = kit.summary(arr);
+    var pf = kit.profile();
+    var latest = arr[0] || this.data.latest;
+    var goal = Number(pf.weekly_goal_sessions || 4);
+    var progress = Math.round((sm.recent_7day_sessions || 0) / goal * 100);
+    if (progress > 100) progress = 100;
+    var change = Number(sm.recent_7day_rate_change || 0);
+    var today = kit.today();
+    this.setData({
+      summary: sm,
+      profile: pf,
+      latest: latest,
+      weekProgress: progress,
+      rateChangeText: change > 0 ? '+' + change + '%' : change + '%',
+      todayStatus: latest.training_date === today ? '今日已完成训练' : '今日暂无训练',
+      todayStatusShort: latest.training_date === today ? '已完成' : '未训练'
+    });
   },
-
-  loadData() {
-    Promise.all([
-      request({ url: `/api/analysis/summary?user_id=${DEFAULT_USER_ID}` }),
-      request({ url: `/api/users/profile?user_id=${DEFAULT_USER_ID}` }),
-      request({ url: `/api/training/sessions?user_id=${DEFAULT_USER_ID}&limit=1` })
-    ]).then(([summary, profile, sessions]) => {
-      const weeklyGoal = Number(profile.weekly_goal_sessions || 3);
-      const targetRate = Number(profile.target_shooting_rate || 55);
-      this.setData({
-        summary,
-        profile,
-        latest: (sessions && sessions[0]) || null,
-        weekProgress: clampPercent(Math.round((summary.recent_7day_sessions || 0) / weeklyGoal * 100)),
-        targetRateProgress: clampPercent(Math.round((summary.avg_shooting_rate || 0) / targetRate * 100))
-      });
-    }).catch(() => {});
-  },
-
-  goRecord() { wx.switchTab({ url: "/pages/record/record" }); },
-  goAnalysis() { wx.switchTab({ url: "/pages/analysis/analysis" }); },
-  goAdvice() { wx.switchTab({ url: "/pages/advice/advice" }); },
-  goProfile() { wx.switchTab({ url: "/pages/profile/profile" }); },
-  goPlayers() { wx.navigateTo({ url: "/pages/players/players" }); },
-  goAbout() { wx.navigateTo({ url: "/pages/about/about" }); },
-
-  seedDemo() {
-    this.setData({ loading: true });
-    request({ url: `/api/demo/seed?user_id=${DEFAULT_USER_ID}`, method: "POST" })
-      .then((res) => {
-        wx.showToast({ title: res.message || "示例数据已加载", icon: "success" });
-        this.loadData();
-      })
-      .finally(() => this.setData({ loading: false }));
-  }
+  seedDemo: function() { if (kit) kit.resetSessions(); this.refresh(); wx.showToast({ title: '示例数据已刷新', icon: 'success' }); },
+  goRecord: function() { wx.switchTab({ url: '/pages/record/record' }); },
+  goAnalysis: function() { wx.switchTab({ url: '/pages/analysis/analysis' }); },
+  goNews: function() { wx.switchTab({ url: '/pages/news/news' }); },
+  goProfile: function() { wx.switchTab({ url: '/pages/profile/profile' }); },
+  goGames: function() { wx.navigateTo({ url: '/pages/games/games' }); },
+  goDetail: function() { wx.navigateTo({ url: '/pages/workout-detail/workout-detail?id=' + this.data.latest.id }); }
 });

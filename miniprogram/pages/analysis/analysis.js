@@ -1,75 +1,45 @@
-const { request } = require("../../utils/request");
-const { DEFAULT_USER_ID } = require("../../utils/config");
-const { clampPercent } = require("../../utils/format");
-
+var kit = null; try { kit = require('../../services/stableData'); } catch(e) { kit = null; }
 Page({
   data: {
-    ranges: [
-      { label: "近 7 次", limit: 7 },
-      { label: "近 12 次", limit: 12 },
-      { label: "全部", limit: 50 }
-    ],
-    rangeIndex: 1,
-    summary: {},
-    trendRows: [],
-    categoryRows: [],
-    zoneRows: [],
-    durationRows: [],
-    conclusion: "暂无训练数据，请先记录一次训练。"
+    summary: { avg_shooting_rate: 51, made_shots: 323, total_shots: 633, paint_rate: 41.7, mid_rate: 52, three_rate: 40.5 },
+    zones: [], heatmapSummary: [], points: [], trend: [], categories: [], selectedZone: {}, selectedZoneKey: '', analysisText: '暂无热区数据，请先记录训练。'
   },
-
-  onShow() { this.loadData(); },
-
-  selectRange(e) {
-    const index = Number(e.currentTarget.dataset.index);
-    this.setData({ rangeIndex: index }, () => this.loadData());
+  onLoad: function(){ this.refresh(); },
+  onShow: function(){ this.refresh(); },
+  refresh: function(){
+    if (!kit) return;
+    var sm = kit.summary();
+    var zones = kit.heatmapZones();
+    var info = kit.heatmapInsight ? kit.heatmapInsight(zones) : { text: this.buildText(zones) };
+    var selected = info.best || this.firstValidZone(zones) || zones[0] || {};
+    this.setData({
+      summary: sm,
+      zones: zones,
+      heatmapSummary: kit.heatmapSummary ? kit.heatmapSummary(zones) : [],
+      points: kit.shotPoints(),
+      trend: kit.trend(),
+      categories: kit.categories(),
+      selectedZone: selected,
+      selectedZoneKey: selected.key || selected.id || '',
+      analysisText: info.text || this.buildText(zones)
+    });
   },
-
-  loadData() {
-    const range = this.data.ranges[this.data.rangeIndex];
-    Promise.all([
-      request({ url: `/api/analysis/summary?user_id=${DEFAULT_USER_ID}` }),
-      request({ url: `/api/analysis/trend?user_id=${DEFAULT_USER_ID}&limit=${range.limit}` }),
-      request({ url: `/api/analysis/category?user_id=${DEFAULT_USER_ID}` }),
-      request({ url: `/api/analysis/zone?user_id=${DEFAULT_USER_ID}` })
-    ]).then(([summary, trend, category, zone]) => {
-      const maxDuration = Math.max.apply(null, (trend.durations || [0]).concat([1]));
-      const trendRows = (trend.dates || []).map((date, idx) => ({
-        date,
-        rate: trend.shooting_rates[idx] || 0,
-        rateWidth: clampPercent(trend.shooting_rates[idx] || 0),
-        duration: trend.durations[idx] || 0,
-        durationHeight: Math.max(8, Math.round((trend.durations[idx] || 0) / maxDuration * 100))
-      }));
-      const maxZone = Math.max.apply(null, (zone.items || []).map(item => item.rate).concat([1]));
-      const zoneRows = (zone.items || []).map(item => ({
-        ...item,
-        width: clampPercent(Math.round(item.rate / maxZone * 100))
-      }));
-      const categoryRows = (category.items || []).map(item => ({ ...item, percentWidth: clampPercent(item.percent) }));
-      this.setData({
-        summary,
-        trendRows,
-        durationRows: trendRows,
-        categoryRows,
-        zoneRows,
-        conclusion: this.buildConclusion(summary, trendRows, categoryRows, zoneRows)
-      });
-    }).catch(() => {});
+  firstValidZone: function(zones) {
+    for (var i = 0; i < zones.length; i++) if (Number(zones[i].attempts || 0) > 0) return zones[i];
+    return null;
   },
-
-  buildConclusion(summary, trendRows, categoryRows, zoneRows) {
-    if (!summary.total_sessions) return "暂无训练数据，请先记录一次训练。";
-    const topCategory = categoryRows[0] ? categoryRows[0].category : "训练";
-    const weakest = zoneRows.length ? zoneRows.slice().sort((a, b) => a.rate - b.rate)[0].zone : "投篮稳定性";
-    const rates = trendRows.map(item => item.rate);
-    let trendText = "整体表现保持稳定";
-    if (rates.length >= 2) {
-      const diff = Math.round((rates[rates.length - 1] - rates[0]) * 10) / 10;
-      trendText = diff >= 0 ? `近段命中率提升 ${diff}%` : `近段命中率下降 ${Math.abs(diff)}%`;
-    }
-    return `${trendText}；当前训练投入主要集中在“${topCategory}”，建议下一阶段重点关注“${weakest}”。`;
+  buildText: function(zones){
+    var valid=[]; for(var i=0;i<zones.length;i++){ if(Number(zones[i].attempts)>0) valid.push(zones[i]); }
+    if(!valid.length) return '暂无热区数据，请先完成一次训练记录。';
+    valid.sort(function(a,b){ return b.percentage-a.percentage; }); var best=valid[0]; var weak=valid[valid.length-1];
+    return '最佳区域：' + best.name + '（' + best.percentage + '%）；待提升区域：' + weak.name + '（' + weak.percentage + '%）。建议保持优势区域训练量，并为薄弱区域安排专项出手。';
   },
-
-  goAdvice() { wx.switchTab({ url: "/pages/advice/advice" }); }
+  onHeatmapZoneChange: function(e){
+    var zone = e.detail;
+    if (zone) this.setData({ selectedZone: zone, selectedZoneKey: zone.key || zone.id || '' });
+  },
+  selectZone: function(e){
+    var id=e.currentTarget.dataset.id; var zones=this.data.zones;
+    for(var i=0;i<zones.length;i++){ if(zones[i].id===id || zones[i].key===id){ this.setData({ selectedZone: zones[i], selectedZoneKey: zones[i].key || zones[i].id || '' }); break; } }
+  }
 });

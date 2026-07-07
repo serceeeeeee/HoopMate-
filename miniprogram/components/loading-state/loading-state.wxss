@@ -1,0 +1,1 @@
+.loading-state{display:flex;justify-content:center;align-items:center;gap:14rpx;color:#8A8F98;font-size:25rpx;padding:36rpx}.spinner{width:32rpx;height:32rpx;border-radius:50%;border:4rpx solid #FFD5C6;border-top-color:#FF5A1F;box-sizing:border-box}

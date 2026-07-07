@@ -1,0 +1,2 @@
+var kit=null; try{ kit=require('../../services/stableData'); }catch(e){ kit=null; }
+Page({ data:{ item:{ title:'新闻详情', source:'HoopMate', publishedAt:'今日', category:'训练技巧', summary:'暂无内容' } }, onLoad:function(opt){ var list=kit?kit.newsList():[]; var id=opt&&opt.id; for(var i=0;i<list.length;i++){ if(list[i].id===id){ this.setData({ item:list[i] }); return; } } if(list[0]) this.setData({ item:list[0] }); } });

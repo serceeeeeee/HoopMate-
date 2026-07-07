@@ -1,83 +1,45 @@
-<view class="hm-page analysis-page">
-  <view class="hm-card page-head">
-    <view class="page-title">数据分析</view>
-    <view class="page-subtitle">用趋势、训练量、专项占比和区域表现复盘训练效果。</view>
-    <view class="range-row">
-      <view wx:for="{{ranges}}" wx:key="label" data-index="{{index}}" bindtap="selectRange" class="range-chip {{rangeIndex === index ? 'active' : ''}}">{{item.label}}</view>
+<view class="hm-page with-tab analysis-page">
+  <view class="wrap-row analysis-metrics">
+    <view class="col-2"><view class="metric-box analysis-metric"><view class="metric-label">总命中率</view><view class="metric-value orange">{{summary.avg_shooting_rate}}<text class="metric-unit">%</text></view><view class="metric-sub">{{summary.made_shots}}/{{summary.total_shots}}</view></view></view>
+    <view class="col-2"><view class="metric-box analysis-metric"><view class="metric-label">禁区</view><view class="metric-value">{{summary.paint_rate}}<text class="metric-unit">%</text></view><view class="metric-sub">近框终结</view></view></view>
+    <view class="col-2"><view class="metric-box analysis-metric"><view class="metric-label">中距离</view><view class="metric-value">{{summary.mid_rate}}<text class="metric-unit">%</text></view><view class="metric-sub">节奏稳定性</view></view></view>
+    <view class="col-2"><view class="metric-box analysis-metric"><view class="metric-label">三分</view><view class="metric-value">{{summary.three_rate}}<text class="metric-unit">%</text></view><view class="metric-sub">外线效率</view></view></view>
+  </view>
+
+  <court-heatmap-canvas
+    zones="{{zones}}"
+    summary="{{heatmapSummary}}"
+    title="投篮热区图"
+    subtitle="颜色越深代表命中率越高，浅灰代表无出手区域"
+    tag="命中率"
+    height-rpx="500"
+    show-legend="{{true}}"
+    interactive="{{true}}"
+    bindzonechange="onHeatmapZoneChange"
+  ></court-heatmap-canvas>
+
+  <view class="hm-card">
+    <view class="section-header"><view><view class="section-title">投篮点位图</view><view class="section-subtitle">橙色圆点表示命中，灰色叉号表示未命中</view></view></view>
+    <view class="court">
+      <view class="court-line paint-line"></view><view class="court-line ft-line"></view><view class="court-line arc-line"></view><view class="court-line hoop-line"></view>
+      <view wx:for="{{points}}" wx:key="id" class="shot-point {{item.made ? '' : 'miss'}}" style="left: {{item.x}}%; top: {{item.y}}%;">{{item.made ? '' : '×'}}</view>
     </view>
-  </view>
-
-  <view class="metric-grid">
-    <view class="metric-card"><view class="metric-value accent">{{summary.avg_shooting_rate || 0}}%</view><view class="metric-label">平均命中率</view></view>
-    <view class="metric-card"><view class="metric-value cyan">{{summary.total_duration || 0}}</view><view class="metric-label">训练总量 / min</view></view>
-    <view class="metric-card"><view class="metric-value">{{summary.total_load || 0}}</view><view class="metric-label">训练负荷</view></view>
-    <view class="metric-card"><view class="metric-value">{{summary.recent_7day_sessions || 0}}</view><view class="metric-label">近 7 天训练次数</view></view>
-  </view>
-
-  <view class="hm-card chart-card">
-    <view class="row-between"><view class="section-title">命中率趋势</view><view class="tag active">折线趋势</view></view>
-    <block wx:if="{{trendRows.length}}">
-      <scroll-view scroll-x class="trend-scroll">
-        <view class="trend-line-wrap">
-          <view wx:for="{{trendRows}}" wx:key="date" class="trend-node">
-            <view class="node-rate">{{item.rate}}%</view>
-            <view class="node-dot" style="bottom: {{item.rateWidth}}%;"></view>
-            <view class="node-line" style="height: {{item.rateWidth}}%;"></view>
-            <view class="node-date">{{item.date}}</view>
-          </view>
-        </view>
-      </scroll-view>
-    </block>
-    <view wx:else class="empty">暂无命中率趋势数据。</view>
-  </view>
-
-  <view class="hm-card chart-card">
-    <view class="row-between"><view class="section-title">训练量趋势</view><view class="tag cyan">柱状图</view></view>
-    <block wx:if="{{durationRows.length}}">
-      <scroll-view scroll-x class="bar-scroll">
-        <view class="bar-wrap">
-          <view wx:for="{{durationRows}}" wx:key="date" class="bar-item">
-            <view class="bar-value">{{item.duration}}</view>
-            <view class="bar" style="height: {{item.durationHeight}}%;"></view>
-            <view class="node-date">{{item.date}}</view>
-          </view>
-        </view>
-      </scroll-view>
-    </block>
-    <view wx:else class="empty">暂无训练量数据。</view>
   </view>
 
   <view class="hm-card">
-    <view class="section-title">项目分析</view>
-    <block wx:if="{{categoryRows.length}}">
-      <view wx:for="{{categoryRows}}" wx:key="category" class="analysis-row">
-        <view class="row-between"><text>{{item.category}} · {{item.sessions}} 次</text><text>{{item.percent}}%</text></view>
-        <view class="progress"><view class="progress-inner" style="width: {{item.percentWidth}}%;"></view></view>
+    <view class="section-header"><view><view class="section-title">命中率趋势</view><view class="section-subtitle">最近 10 次训练命中率变化</view></view></view>
+    <view class="trend-card">
+      <view wx:for="{{trend}}" wx:key="label" class="trend-col">
+        <view class="trend-bar" style="height: {{item.height}}%;"></view>
+        <view class="trend-label">{{item.label}}</view>
       </view>
-    </block>
-    <view wx:else class="empty">暂无训练类型占比数据。</view>
-  </view>
-
-  <view class="hm-card court-card">
-    <view class="row-between"><view class="section-title">区域分析</view><view class="tag warn">半场区域</view></view>
-    <view class="court-visual">
-      <view class="court-line arc"></view>
-      <view class="court-line paint"></view>
-      <view class="rim"></view>
-      <view wx:for="{{zoneRows}}" wx:key="zone" class="zone-label zone-{{index}}">{{item.zone}} {{item.rate}}%</view>
     </view>
-    <block wx:if="{{zoneRows.length}}">
-      <view wx:for="{{zoneRows}}" wx:key="zone" class="analysis-row">
-        <view class="row-between"><text>{{item.zone}}：{{item.makes}}/{{item.attempts}}</text><text>{{item.rate}}%</text></view>
-        <view class="progress"><view class="progress-inner" style="width: {{item.width}}%;"></view></view>
-      </view>
-    </block>
-    <view wx:else class="empty">暂无区域分析数据。请录入罚球、中投或三分分项。</view>
   </view>
 
-  <view class="hm-card conclusion-card">
-    <view class="section-title">数据结论</view>
-    <view class="conclusion-text">{{conclusion}}</view>
-    <button class="primary-btn" bindtap="goAdvice">查看训练建议</button>
+  <view class="hm-card">
+    <view class="section-header"><view><view class="section-title">项目分析</view><view class="section-subtitle">按训练时长统计不同训练类型占比</view></view></view>
+    <view wx:for="{{categories}}" wx:key="name" class="bar-row">
+      <view class="bar-label">{{item.name}}</view><view class="bar-track"><view class="bar-fill" style="width: {{item.percent}}%;"></view></view><view class="bar-value">{{item.percent}}%</view>
+    </view>
   </view>
 </view>

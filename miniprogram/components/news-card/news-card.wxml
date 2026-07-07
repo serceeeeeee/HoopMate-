@@ -1,0 +1,8 @@
+<view class="news-card" bindtap="open">
+  <view class="thumb {{item.imageUrl ? '' : 'empty'}}"><image wx:if="{{item.imageUrl}}" src="{{item.imageUrl}}" mode="aspectFill" /></view>
+  <view class="news-body">
+    <view class="news-title">{{item.title}}</view>
+    <view class="news-summary">{{item.summary}}</view>
+    <view class="news-meta"><text>{{item.source}}</text><text>{{item.publishedAt}}</text></view>
+  </view>
+</view>

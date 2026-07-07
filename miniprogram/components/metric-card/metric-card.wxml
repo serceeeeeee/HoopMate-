@@ -1,0 +1,1 @@
+<view class="metric-card {{variant}}"><view class="metric-value">{{value}}<text wx:if="{{unit}}" class="unit">{{unit}}</text></view><view class="metric-title">{{title}}</view><view wx:if="{{subtitle}}" class="metric-subtitle">{{subtitle}}</view><view wx:if="{{trend}}" class="metric-trend">{{trend}}</view></view>

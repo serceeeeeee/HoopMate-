@@ -1,0 +1,12 @@
+<scroll-view scroll-x="true" class="trend-scroll">
+  <view class="trend-wrap {{mode}}">
+    <view wx:for="{{rows}}" wx:key="date" class="trend-item">
+      <view class="trend-value">{{mode == 'bar' ? item.value : item.rate}}{{unit}}</view>
+      <view class="trend-stage">
+        <view wx:if="{{mode == 'bar'}}" class="bar" style="height: {{item.height}}%;"></view>
+        <block wx:if="{{mode != 'bar'}}"><view class="line" style="height: {{item.y}}%;"></view><view class="dot" style="bottom: {{item.y}}%;"></view></block>
+      </view>
+      <view class="trend-date">{{item.date}}</view>
+    </view>
+  </view>
+</scroll-view>

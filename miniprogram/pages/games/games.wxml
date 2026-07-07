@@ -1,0 +1,10 @@
+<view class="hm-page">
+  <view class="page-head"><view class="page-kicker">BASKETBALL GAMES</view><view class="page-title">篮球赛事数据</view><view class="page-subtitle">今日比赛、近期赛程和比赛结果。默认使用 mock 数据，真实 API 由后端代理配置。</view></view>
+  <view class="hm-card"><view class="tag-row"><view wx:for="{{leagues}}" wx:key="*this" class="tag {{activeLeague===item?'active':''}}" data-value="{{item}}" bindtap="chooseLeague">{{item}}</view></view></view>
+  <view wx:for="{{list}}" wx:key="id" class="hm-card">
+    <view class="row-between"><view class="tag active">{{item.league}}</view><view class="tag {{item.status==='Live'?'warn':(item.status==='Finished'?'good':'work')}}">{{item.status}}</view></view>
+    <view class="row-between" style="margin-top:22rpx;"><view class="record-title">{{item.homeTeam}}</view><view class="record-rate">{{item.homeScore}}</view></view>
+    <view class="row-between" style="margin-top:12rpx;"><view class="record-title">{{item.awayTeam}}</view><view class="record-rate">{{item.awayScore}}</view></view>
+    <view class="record-meta">{{item.startTime}} · {{item.venue}}</view>
+  </view>
+</view>

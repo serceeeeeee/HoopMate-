@@ -1,55 +1,23 @@
-<view class="hm-page profile-page">
-  <view class="hm-card card-highlight profile-head">
-    <view class="avatar-large">{{avatarLetter}}</view>
-    <view class="profile-name">{{profile.nickname || 'HoopMate 用户'}}</view>
-    <view class="tag-row center-tags">
-      <view class="tag active">{{profile.position || 'SG'}}</view>
-      <view class="tag cyan">{{profile.skill_level || '中级'}}</view>
-      <view class="tag green">目标 {{profile.weekly_goal_sessions || 3}} 次/周</view>
-    </view>
+<view class="hm-page with-tab">
+  <view class="page-head"><view class="page-kicker">PROFILE</view><view class="page-title">个人档案</view><view class="page-subtitle">维护训练水平、场上位置、每周目标和阶段目标。</view></view>
+
+  <view class="hm-card">
+    <view class="row-between"><view><view class="record-title">{{form.nickname}}</view><view class="record-meta">{{form.skill_level}} · {{form.position}}</view></view><view class="metric-box" style="width:170rpx;text-align:center;min-height:120rpx;"><view class="record-rate">{{form.target_accuracy}}%</view><view class="metric-sub">目标命中率</view></view></view>
   </view>
 
   <view class="hm-card">
-    <view class="section-title">基础资料</view>
-    <view class="form-item"><text class="label">昵称</text><input class="input" value="{{profile.nickname}}" data-field="nickname" bindinput="onInput" /></view>
-    <view class="form-item">
-      <text class="label">场上位置</text>
-      <view class="tag-row">
-        <view wx:for="{{positions}}" wx:key="*this" class="tag {{profile.position === item ? 'active' : ''}}" data-value="{{item}}" bindtap="choosePosition">{{item}}</view>
-      </view>
-    </view>
-    <view class="form-item">
-      <text class="label">训练水平</text>
-      <view class="tag-row">
-        <view wx:for="{{levels}}" wx:key="*this" class="tag {{profile.skill_level === item ? 'active' : ''}}" data-value="{{item}}" bindtap="chooseLevel">{{item}}</view>
-      </view>
-    </view>
-    <view class="two-col">
-      <view class="form-item"><text class="label">身高 cm</text><input class="input" type="number" value="{{profile.height_cm}}" data-field="height_cm" bindinput="onNumberInput" /></view>
-      <view class="form-item"><text class="label">体重 kg</text><input class="input" type="digit" value="{{profile.weight_kg}}" data-field="weight_kg" bindinput="onNumberInput" /></view>
-    </view>
-  </view>
-
-  <view class="hm-card">
-    <view class="section-title">目标设置</view>
-    <view class="two-col">
-      <view class="form-item"><text class="label">每周训练次数</text><input class="input" type="number" value="{{profile.weekly_goal_sessions}}" data-field="weekly_goal_sessions" bindinput="onNumberInput" /></view>
-      <view class="form-item"><text class="label">每周训练分钟</text><input class="input" type="number" value="{{profile.weekly_goal_minutes}}" data-field="weekly_goal_minutes" bindinput="onNumberInput" /></view>
-    </view>
-    <view class="form-item"><text class="label">目标命中率 %</text><input class="input" type="digit" value="{{profile.target_shooting_rate}}" data-field="target_shooting_rate" bindinput="onNumberInput" /></view>
-    <view class="form-item"><text class="label">阶段目标</text><textarea class="textarea" value="{{profile.stage_goal || profile.goal}}" data-field="stage_goal" bindinput="onInput" placeholder="例如：4 周内三分命中率提升到 35%" /></view>
+    <view class="section-header"><view><view class="section-title">基础信息</view><view class="section-subtitle">保存后首页目标完成度会更新</view></view></view>
+    <view class="form-item"><text class="label">昵称</text><input class="input" value="{{form.nickname}}" data-field="nickname" bindinput="onInput" /></view>
+    <view class="form-item"><text class="label">训练水平</text><view class="tag-row"><view wx:for="{{levels}}" wx:key="*this" class="tag {{form.skill_level===item?'active':''}}" data-field="skill_level" data-value="{{item}}" bindtap="choose">{{item}}</view></view></view>
+    <view class="form-item"><text class="label">场上位置</text><view class="tag-row"><view wx:for="{{positions}}" wx:key="*this" class="tag {{form.position===item?'active':''}}" data-field="position" data-value="{{item}}" bindtap="choose">{{item}}</view></view></view>
+    <view class="wrap-row"><view class="col-2"><view class="form-item"><text class="label">每周训练次数</text><input class="input" type="number" value="{{form.weekly_goal_sessions}}" data-field="weekly_goal_sessions" bindinput="onInput" /></view></view><view class="col-2"><view class="form-item"><text class="label">每周训练分钟</text><input class="input" type="number" value="{{form.weekly_goal_minutes}}" data-field="weekly_goal_minutes" bindinput="onInput" /></view></view></view>
+    <view class="form-item"><text class="label">目标命中率</text><input class="input" type="number" value="{{form.target_accuracy}}" data-field="target_accuracy" bindinput="onInput" /></view>
+    <view class="form-item"><text class="label">阶段目标</text><textarea class="textarea" value="{{form.stage_goal}}" data-field="stage_goal" bindinput="onInput" /></view>
     <button class="primary-btn" bindtap="save">保存档案</button>
   </view>
 
   <view class="hm-card">
-    <view class="section-title">数据管理与项目入口</view>
-    <view class="quick-list">
-      <view class="quick-row" bindtap="seedDemo"><text>加载示例数据</text><text>生成演示训练记录</text></view>
-      <view class="quick-row" bindtap="exportCsv"><text>CSV 导出</text><text>复制训练记录导出链接</text></view>
-      <view class="quick-row" bindtap="goPlayers"><text>球员数据展示</text><text>合成数据表、柱状图和散点图</text></view>
-      <view class="quick-row" bindtap="goAbout"><text>项目说明</text><text>定位、技术方案和验收重点</text></view>
-      <view class="quick-row danger" bindtap="clearLocal"><text>清理本地缓存</text><text>不删除后端训练记录</text></view>
-    </view>
-    <view wx:if="{{exportUrl}}" class="export-tip">导出地址已复制：{{exportUrl}}</view>
+    <view class="section-header"><view><view class="section-title">更多入口</view><view class="section-subtitle">项目展示与扩展页面</view></view></view>
+    <view class="quick-wrap"><view class="quick-item" bindtap="goGames"><view class="quick-inner"><view class="quick-title">赛事数据</view><view class="quick-desc">赛程与比分</view></view></view><view class="quick-item" bindtap="goPlayers"><view class="quick-inner"><view class="quick-title">球员数据</view><view class="quick-desc">合成数据展示</view></view></view><view class="quick-item" bindtap="goAdvice"><view class="quick-inner"><view class="quick-title">训练建议</view><view class="quick-desc">下一周计划</view></view></view><view class="quick-item" bindtap="goAbout"><view class="quick-inner"><view class="quick-title">项目说明</view><view class="quick-desc">技术方案</view></view></view></view>
   </view>
 </view>

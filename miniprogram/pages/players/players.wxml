@@ -1,53 +1,5 @@
-<view class="hm-page players-page">
-  <view class="hm-card card-highlight">
-    <view class="page-title">球员数据展示</view>
-    <view class="page-subtitle">{{description}}</view>
-  </view>
-
-  <view class="metric-grid">
-    <view class="metric-card"><view class="metric-value accent">{{summary.avg_points || 0}}</view><view class="metric-label">平均得分</view></view>
-    <view class="metric-card"><view class="metric-value cyan">{{summary.avg_rebounds || 0}}</view><view class="metric-label">平均篮板</view></view>
-    <view class="metric-card"><view class="metric-value">{{summary.avg_assists || 0}}</view><view class="metric-label">平均助攻</view></view>
-    <view class="metric-card"><view class="metric-value">{{summary.avg_shooting_rate || 0}}%</view><view class="metric-label">平均命中率</view></view>
-  </view>
-
-  <view class="hm-card">
-    <view class="row-between">
-      <view class="section-title">数据筛选</view>
-      <picker range="{{positions}}" value="{{positionIndex}}" bindchange="onPositionChange">
-        <view class="tag active">位置：{{selectedPosition}}</view>
-      </picker>
-    </view>
-  </view>
-
-  <view class="hm-card">
-    <view class="section-title">合成球员数据表</view>
-    <scroll-view scroll-x class="table-scroll">
-      <view class="player-table">
-        <view class="table-row table-head"><text>球员</text><text>位置</text><text>得分</text><text>篮板</text><text>助攻</text><text>命中率</text></view>
-        <view wx:for="{{players}}" wx:key="player_name" class="table-row">
-          <text>{{item.player_name}}</text><text>{{item.position}}</text><text>{{item.points}}</text><text>{{item.rebounds}}</text><text>{{item.assists}}</text><text>{{item.shooting_rate}}%</text>
-        </view>
-      </view>
-    </scroll-view>
-  </view>
-
-  <view class="hm-card">
-    <view class="row-between"><view class="section-title">得分柱状图</view><view class="tag cyan">Points</view></view>
-    <view wx:for="{{bars}}" wx:key="player_name" class="bar-row">
-      <view class="bar-name">{{item.player_name}}</view>
-      <view class="bar-track"><view class="bar-fill" style="width: {{item.width}}%;"></view></view>
-      <view class="bar-num">{{item.points}}</view>
-    </view>
-  </view>
-
-  <view class="hm-card">
-    <view class="row-between"><view class="section-title">命中率 × 得分散点图</view><view class="tag warn">Bubble</view></view>
-    <view class="scatter-box">
-      <view class="axis-label x-label">命中率</view>
-      <view class="axis-label y-label">得分</view>
-      <view wx:for="{{scatter}}" wx:key="player_name" class="scatter-dot" style="left: {{item.x}}%; bottom: {{item.y}}%; width: {{item.size}}rpx; height: {{item.size}}rpx; line-height: {{item.size}}rpx;">{{item.position}}</view>
-    </view>
-    <view class="page-subtitle">横轴为命中率，纵轴为场均得分，点大小代表综合效率评分。</view>
-  </view>
+<view class="hm-page">
+  <view class="page-head"><view class="page-kicker">PLAYER DATA</view><view class="page-title">球员数据展示</view><view class="page-subtitle">使用合成示例数据展示表格、柱状图和数据分析能力。</view></view>
+  <view class="hm-card"><view class="section-header"><view><view class="section-title">得分柱状图</view><view class="section-subtitle">柱高表示场均得分</view></view></view><view class="trend-card"><view wx:for="{{players}}" wx:key="name" class="trend-col"><view class="trend-bar" style="height: {{item.height}}%;"></view><view class="trend-label">{{item.name}}</view></view></view></view>
+  <view class="hm-card"><view class="section-header"><view><view class="section-title">球员数据表</view><view class="section-subtitle">合成数据，不代表真实比赛结果</view></view></view><view wx:for="{{players}}" wx:key="name" class="record-card"><view class="row-between"><view><view class="record-title">{{item.name}} · {{item.position}}</view><view class="record-meta">篮板 {{item.rebounds}} · 助攻 {{item.assists}} · 命中率 {{item.rate}}%</view></view><view class="record-rate">{{item.points}}</view></view></view></view>
 </view>

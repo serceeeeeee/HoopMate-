@@ -1,0 +1,67 @@
+<view class="heatmap-card">
+  <view class="heatmap-head">
+    <view class="head-copy">
+      <view class="heatmap-title">{{title}}</view>
+      <view class="heatmap-subtitle">{{subtitle}}</view>
+    </view>
+    <view class="mode-switch" wx:if="{{showModeSwitch}}">
+      <view wx:for="{{modes}}" wx:key="key" data-mode="{{item.key}}" bindtap="switchMode" class="mode-chip {{currentMode == item.key ? 'active' : ''}}">{{item.label}}</view>
+    </view>
+  </view>
+
+  <view class="summary-strip" wx:if="{{showSummary && !empty}}">
+    <view wx:for="{{summary}}" wx:key="label" class="summary-cell {{item.empty ? 'muted' : ''}}">
+      <text class="summary-rate">{{item.rateText}}</text>
+      <text class="summary-label">{{item.label}}</text>
+      <text class="summary-sub">{{item.sub}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{empty}}" class="heatmap-empty">
+    <view class="empty-icon">○</view>
+    <view class="empty-title">暂无热区数据</view>
+    <view class="empty-desc">完成一次包含投篮数和命中数的训练记录后，这里将显示区域命中率。</view>
+    <button class="empty-btn" bindtap="goRecord">去记录训练</button>
+  </view>
+
+  <view wx:else class="court-shell">
+    <view class="court-surface">
+      <view class="court-line court-outer"></view>
+      <view class="court-line three-arc"></view>
+      <view class="court-line lane-box"></view>
+      <view class="court-line ft-circle"></view>
+      <view class="court-line backboard"></view>
+      <view class="court-line rim"></view>
+
+      <view wx:for="{{tiles}}" wx:key="id" data-id="{{item.id}}" bindtap="tapZone" class="heat-segment segment-{{item.key}} {{item.levelClass}} {{selectedZoneId == item.id ? 'is-selected' : ''}} {{item.empty ? 'is-empty' : ''}}">
+        <text class="zone-name">{{item.shortName}}</text>
+        <text class="zone-value">{{item.displayValue}}</text>
+        <text class="zone-sub">{{item.subText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="legend-row" wx:if="{{showLegend && !empty}}">
+    <view class="legend-item"><text class="legend-swatch swatch-empty"></text><text>无出手</text></view>
+    <view class="legend-scale"><text></text><text></text><text></text><text></text></view>
+    <view class="legend-item right"><text>低</text><text class="legend-arrow">→</text><text>高</text></view>
+  </view>
+
+  <view class="detail-panel" wx:if="{{interactive && selectedZone && !empty}}">
+    <view class="detail-main">
+      <view class="detail-name">{{selectedZone.name}}</view>
+      <view class="detail-rate">{{selectedZone.label}}</view>
+      <view class="detail-sub">{{selectedZone.makes}}/{{selectedZone.attempts}} · 出手占比 {{selectedZone.shareText}}</view>
+    </view>
+    <view class="detail-compare">
+      <text>{{selectedZone.detailLabel}}</text>
+      <text>{{selectedZone.diffText}}</text>
+      <text>较整体均值</text>
+    </view>
+  </view>
+
+  <view class="insight-box" wx:if="{{showInsight && !empty}}">
+    <view class="insight-title">热区结论</view>
+    <view class="insight-text">{{insightText}}</view>
+  </view>
+</view>

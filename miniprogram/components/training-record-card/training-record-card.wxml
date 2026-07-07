@@ -1,0 +1,19 @@
+<view class="record-card" bindtap="openDetail">
+  <view class="record-top">
+    <view>
+      <view class="record-title">{{record.category}} · {{record.training_date}}</view>
+      <view class="record-meta">{{record.duration_min}} min · 强度 {{record.intensity}} · 负荷 {{record.training_load}}</view>
+    </view>
+    <view class="rate-tag {{record.rateLevel}}">{{record.rateLabel}}</view>
+  </view>
+  <view class="record-data">
+    <view><text>{{record.total_shots}}</text><text>出手</text></view>
+    <view><text>{{record.made_shots}}</text><text>命中</text></view>
+    <view><text>{{record.shooting_rate}}%</text><text>命中率</text></view>
+  </view>
+  <view class="record-note">{{record.note || '暂无备注，点击查看训练详情'}}</view>
+  <view class="record-actions">
+    <button class="detail-btn" catchtap="openDetail">详情</button>
+    <button class="delete-btn" catchtap="remove">删除</button>
+  </view>
+</view>

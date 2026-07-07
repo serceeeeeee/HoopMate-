@@ -1,0 +1,1 @@
+<button class="obtn {{type}}" disabled="{{disabled}}" bindtap="onTap">{{text}}</button>

@@ -1,0 +1,5 @@
+<view class="shot-court">
+  <view class="rim"></view><view class="backboard"></view><view class="paint-box"></view><view class="free-circle"></view><view class="three-arc"></view>
+  <view wx:for="{{points}}" wx:key="id" data-item="{{item}}" bindtap="tapPoint" class="shot-point {{item.made ? 'made' : 'miss'}}" style="left: {{item.x}}%; bottom: {{item.y}}%;">{{item.made ? '' : '×'}}</view>
+</view>
+<view class="shot-legend"><view><text class="dot made"></text>命中</view><view><text class="dot miss"></text>未中</view></view>

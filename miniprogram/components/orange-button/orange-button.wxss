@@ -1,0 +1,1 @@
+.obtn{height:86rpx;line-height:86rpx;border-radius:18rpx;font-size:28rpx;font-weight:700;margin:0}.primary{background:#FF5A1F;color:#fff;border:1rpx solid #FF5A1F}.secondary{background:#FFF2EC;color:#FF5A1F;border:1rpx solid #FFD5C6}.ghost{background:#fff;color:#3B424C;border:1rpx solid #D9DEE7}

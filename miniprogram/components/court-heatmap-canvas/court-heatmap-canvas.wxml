@@ -1,0 +1,43 @@
+<view class="court-heatmap-card">
+  <view class="court-heatmap-head">
+    <view class="court-heatmap-copy">
+      <view class="court-heatmap-title">{{title}}</view>
+      <view class="court-heatmap-subtitle">{{subtitle}}</view>
+    </view>
+    <view class="court-heatmap-tag">{{tag}}</view>
+  </view>
+
+  <view class="court-summary-strip" wx:if="{{summaryList.length}}">
+    <view wx:for="{{summaryList}}" wx:key="label" class="court-summary-cell">
+      <view class="court-summary-name">{{item.label}}</view>
+      <view class="court-summary-rate">{{item.value}}</view>
+      <view class="court-summary-sub">{{item.sub}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{empty}}" class="court-heatmap-empty">
+    <view class="court-empty-title">暂无热区数据</view>
+    <view class="court-empty-desc">完成一次包含投篮数和命中数的训练记录后，这里将显示半场区域命中率。</view>
+    <button class="court-empty-btn" bindtap="goRecord">去记录训练</button>
+  </view>
+
+  <view wx:else class="court-canvas-wrap">
+    <canvas class="court-heatmap-canvas" canvas-id="courtHeatmapCanvas" id="courtHeatmapCanvas" style="height: {{heightRpx}}rpx;" bindtap="handleCanvasTap"></canvas>
+  </view>
+
+  <view class="court-legend" wx:if="{{showLegend && !empty}}">
+    <view class="court-legend-left"><view class="court-legend-empty"></view><text>无出手</text></view>
+    <view class="court-legend-scale"><view class="l1"></view><view class="l2"></view><view class="l3"></view><view class="l4"></view></view>
+    <view class="court-legend-text"><text>低命中率</text><text>高命中率</text></view>
+  </view>
+
+  <view class="court-selected-panel" wx:if="{{selectedZone && !empty}}">
+    <view>
+      <view class="court-selected-name">{{selectedZoneTitle}}</view>
+      <view class="court-selected-meta">{{selectedZone.made}}/{{selectedZone.attempts}} · 出手占比 {{selectedZone.shareText}}</view>
+    </view>
+    <view class="court-selected-rate">{{selectedZone.rateText}}</view>
+  </view>
+
+  <view class="court-heatmap-insight" wx:if="{{insightText && !empty}}">{{insightText}}</view>
+</view>

@@ -1,31 +1,7 @@
-<view class="hm-page about-page">
-  <view class="hm-card card-highlight">
-    <view class="page-title">项目说明</view>
-    <view class="page-subtitle">HoopMate 是面向篮球爱好者的轻量级篮球训练记录与数据分析工具，用于实习项目 Demo、开发汇报和成果验收。</view>
-  </view>
-
-  <view class="hm-card">
-    <view class="section-title">项目定位</view>
-    <view class="about-text">围绕篮球运动与个人训练场景，提供训练数据记录、趋势复盘、规则化建议和数据可视化展示，帮助用户形成持续训练和科学复盘习惯。</view>
-  </view>
-
-  <view class="hm-card">
-    <view class="section-title">核心功能</view>
-    <view wx:for="{{features}}" wx:key="*this" class="about-row"><text>{{index + 1}}</text><view>{{item}}</view></view>
-  </view>
-
-  <view class="hm-card">
-    <view class="section-title">技术方案</view>
-    <view wx:for="{{techs}}" wx:key="*this" class="about-row cyan"><text>{{index + 1}}</text><view>{{item}}</view></view>
-  </view>
-
-  <view class="hm-card">
-    <view class="section-title">数据来源说明</view>
-    <view wx:for="{{sources}}" wx:key="*this" class="about-row"><text>{{index + 1}}</text><view>{{item}}</view></view>
-  </view>
-
-  <view class="hm-card">
-    <view class="section-title">验收重点对应</view>
-    <view wx:for="{{checks}}" wx:key="*this" class="about-row green"><text>{{index + 1}}</text><view>{{item}}</view></view>
-  </view>
+<view class="hm-page">
+  <view class="page-head"><view class="page-kicker">ABOUT HOOPMATE</view><view class="page-title">项目说明</view><view class="page-subtitle">轻量级篮球训练记录、数据分析与个性化训练建议小程序。</view></view>
+  <view class="hm-card"><view class="section-title">项目定位</view><view class="page-subtitle">HoopMate 面向篮球爱好者，提供训练记录、投篮热区、点位分析、趋势复盘、新闻赛事和训练建议。</view></view>
+  <view class="hm-card"><view class="section-title">技术方案</view><view class="record-card"><view class="record-title">微信小程序前端</view><view class="record-meta">WXML、WXSS、JavaScript、原生 TabBar、卡片式 UI。</view></view><view class="record-card"><view class="record-title">Python FastAPI 后端</view><view class="record-meta">提供训练记录、数据分析、新闻和赛事代理接口。</view></view><view class="record-card"><view class="record-title">数据可视化</view><view class="record-meta">使用 WXML + WXSS 实现轻量热区图、点位图和趋势图，稳定适配小程序。</view></view></view>
+  <view class="hm-card"><view class="section-title">数据来源</view><view class="page-subtitle">训练数据来自用户手动录入、CSV 导入或本地 mock 数据；新闻和赛事页面默认使用 mock 数据，真实 API Key 应在后端环境变量配置。</view></view>
+  <view class="hm-card"><view class="section-title">验收重点</view><view class="page-subtitle">项目需要可运行、可演示、核心功能正常、数据展示清晰，并提供完整源代码、运行说明和项目设计文档。</view></view>
 </view>
